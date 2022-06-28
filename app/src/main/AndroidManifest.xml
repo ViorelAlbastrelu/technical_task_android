@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.sliide.usermanager">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:name=".SliideUsersManager"
         android:allowBackup="true"
