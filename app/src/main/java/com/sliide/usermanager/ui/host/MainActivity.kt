@@ -1,9 +1,11 @@
-package com.sliide.usermanager
+package com.sliide.usermanager.ui.host
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.sliide.usermanager.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
