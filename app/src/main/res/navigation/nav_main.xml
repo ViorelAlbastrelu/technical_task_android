@@ -8,6 +8,6 @@
     <fragment
         android:id="@+id/usersListFragment"
         android:name="com.sliide.usermanager.ui.userslist.UsersListFragment"
-        android:label="fragment_users_list"
+        android:label="@string/user_list_toolbar_title"
         tools:layout="@layout/fragment_users_list" />
 </navigation>
