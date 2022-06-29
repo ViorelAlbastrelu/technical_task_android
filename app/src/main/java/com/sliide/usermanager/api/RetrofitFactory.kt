@@ -12,7 +12,7 @@ class RetrofitFactory(
 ) {
     private var authorization = OkHttpClient.Builder().addInterceptor { chain ->
         val newRequest: Request = chain.request().newBuilder()
-            .addHeader("Authorization", token)
+            .addHeader("Authorization", "Bearer $token")
             .build()
         chain.proceed(newRequest)
     }.build()

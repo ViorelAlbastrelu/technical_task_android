@@ -5,8 +5,8 @@ import retrofit2.http.*
 
 interface UsersService {
 
-    @GET("v2/users?page={pageNumber}")
-    suspend fun getUsers(@Path("pageNumber") page: String): List<User>
+    @GET("v2/users")
+    suspend fun getUsers(@Query("page") page: String): List<User>
 
     @GET("v2/users/{id}")
     suspend fun getUserDetails(@Path("id") id: String): User

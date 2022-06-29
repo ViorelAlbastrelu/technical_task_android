@@ -3,23 +3,36 @@ package com.sliide.usermanager.ui.userslist
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.core.view.isGone
 import androidx.fragment.app.viewModels
+import com.sliide.usermanager.core.BindingFragment
 import com.sliide.usermanager.databinding.FragmentUsersListBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class UsersListFragment : Fragment() {
+class UsersListFragment : BindingFragment<FragmentUsersListBinding>() {
 
-    private lateinit var binding: FragmentUsersListBinding
     private val viewModel: UsersListViewModel by viewModels()
+    private val usersAdapter = UsersAdapter()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentUsersListBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun inflateBinding(inflater: LayoutInflater): FragmentUsersListBinding {
+        return FragmentUsersListBinding.inflate(inflater)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.userList.adapter = usersAdapter
+        viewModel.fetchUsers()
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UserListState.ListUsers -> {
+                    usersAdapter.submitList(state.users)
+                }
+                UserListState.NoUsers -> {
+                    binding.userList.isGone = true
+                }
+            }
+        }
     }
 }

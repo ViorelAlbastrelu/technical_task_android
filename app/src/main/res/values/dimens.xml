@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="user_item_padding">16dp</dimen>
+    <dimen name="user_item_name_size">18sp</dimen>
+    <dimen name="user_item_email_top_padding">4dp</dimen>
+</resources>

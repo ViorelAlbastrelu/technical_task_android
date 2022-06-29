@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">UserManager</string>
+
+    <!--User-->
+    <string name="user_item_label_email">Email:</string>
+    <string name="user_item_label_creation_time">Creation time:</string>
 </resources>
