@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
+import com.sliide.usermanager.core.AlertDialogFactory
 import com.sliide.usermanager.core.BindingDialogFragment
 import com.sliide.usermanager.databinding.FragmentUserAddBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,7 +35,11 @@ class UserAddFragment : BindingDialogFragment<FragmentUserAddBinding>() {
             when (state) {
                 is UserAddState.AllowAdd -> enableAdd(state.enable)
                 UserAddState.Success -> dismiss()
-                is UserAddState.Error -> TODO()
+                is UserAddState.Error -> {
+                    AlertDialogFactory.create(requireContext(), state.error) {
+                        dismiss()
+                    }
+                }
             }
         }
     }

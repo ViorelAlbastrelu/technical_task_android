@@ -1,22 +1,23 @@
 package com.sliide.usermanager.api
 
 import com.sliide.usermanager.api.model.User
+import retrofit2.Response
 import retrofit2.http.*
 
 interface UsersService {
 
-    @GET("v2/users")
-    suspend fun getUsers(@Query("page") page: String): List<User>
+    @GET("users")
+    suspend fun getUsers(@Query("page") page: String): Response<List<User>>
 
-    @GET("v2/users/{id}")
-    suspend fun getUserDetails(@Path("id") id: String): User
+    @GET("users/{id}")
+    suspend fun getUserDetails(@Path("id") id: String): Response<User>
 
-    @POST("v2/users")
-    suspend fun createUser(user: User)
+    @POST("users")
+    suspend fun createUser(@Body user: User): Response<User>
 
-    @PUT("v2/users/{id}")
+    @PUT("users/{id}")
     suspend fun updateUser(user: User)
 
-    @DELETE("v2/users/{id}")
+    @DELETE("users/{id}")
     suspend fun deleteUser(@Path("id") id: String)
 }

@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sliide.usermanager.domain.UsersRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,7 +25,11 @@ class UserAddViewModel @Inject constructor(
     fun addUser(name: String?, email: String?) {
         viewModelScope.launch {
             usersRepository.addUser(name!!, email!!)
-            _state.value = UserAddState.Success
+                .catch { throwable ->
+                    throwable.message?.let { _state.value = UserAddState.Error(it) }
+                }.collect {
+                    _state.value = UserAddState.Success
+                }
         }
     }
 
@@ -32,7 +38,7 @@ class UserAddViewModel @Inject constructor(
         _state.value = UserAddState.AllowAdd(addAllowed)
     }
 
-    fun isNameEmail(name: CharSequence): Boolean {
+    private fun isNameEmail(name: CharSequence): Boolean {
         return if (TextUtils.isEmpty(name)) {
             false
         } else {
@@ -40,7 +46,7 @@ class UserAddViewModel @Inject constructor(
         }
     }
 
-    fun isValidEmail(email: CharSequence): Boolean {
+    private fun isValidEmail(email: CharSequence): Boolean {
         return if (TextUtils.isEmpty(email)) {
             false
         } else {
@@ -50,6 +56,5 @@ class UserAddViewModel @Inject constructor(
 
     companion object {
         private const val MIN_NAME_LENGTH = 4
-
     }
 }

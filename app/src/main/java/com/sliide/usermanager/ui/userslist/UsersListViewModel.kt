@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.sliide.usermanager.domain.UsersRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,12 +25,15 @@ class UsersListViewModel @Inject constructor(
         viewModelScope.launch {
             loading()
             delay(2000) // added to see loading
-            val usersAtPage = usersRepository.getUsersAtPage(page.toString())
-            if (usersAtPage.isNotEmpty()){
-                loading(false)
-                _state.value = UserListState.ListUsers(usersAtPage)
-            } else {
-                _state.value = UserListState.NoUsers
+            usersRepository.getUsersAtPage(page.toString()).catch { throwable ->
+                throwable.message?.let { _state.value = UserListState.Error(it) }
+            }.collect { usersAtPage ->
+                if (usersAtPage.isNotEmpty()){
+                    loading(false)
+                    _state.value = UserListState.ListUsers(usersAtPage)
+                } else {
+                    _state.value = UserListState.NoUsers
+                }
             }
         }
     }
