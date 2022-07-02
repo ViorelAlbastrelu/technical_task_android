@@ -3,6 +3,7 @@ package com.sliide.usermanager.domain
 import com.sliide.usermanager.api.UsersService
 import com.sliide.usermanager.domain.model.User
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -13,27 +14,26 @@ class UsersRepository(
 ) : UsersRepo {
 
     private var usersCache: HashMap<Int, User> = hashMapOf()
+    override var userListFlow: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
 
-    override suspend fun getUsersAtPage(): Flow<List<User>> {
+    override suspend fun getUsersAtPage() {
         val firstPageResponse = usersService.getUsers(FIRST_PAGE)
-        return flow {
-            if (firstPageResponse.isSuccessful) {
-                val lastPage = firstPageResponse.headers()["X-Pagination-Pages"] ?: FIRST_PAGE
-                val lastPageResponse = usersService.getUsers(lastPage)
-                val body = lastPageResponse.body()
+        if (firstPageResponse.isSuccessful) {
+            val lastPage = firstPageResponse.headers()["X-Pagination-Pages"] ?: FIRST_PAGE
+            val lastPageResponse = usersService.getUsers(FIRST_PAGE) //TODO replace with last page
+            val body = lastPageResponse.body()
 
-                when {
-                    lastPageResponse.isSuccessful && body != null -> {
-                        val domainUsers = body.map { it.toDomain() }
-                        domainUsers.associateByTo(usersCache) { it.id }
-                        emit(domainUsers)
-                    }
-                    usersCache.isNotEmpty() -> emit(usersCache.values.toList())
-                    else -> throw(Throwable(lastPageResponse.message()))
+            when {
+                lastPageResponse.isSuccessful && body != null -> {
+                    val domainUsers = body.map { it.toDomain() }
+                    domainUsers.associateByTo(usersCache) { it.id }
+                    userListFlow.emit(domainUsers)
                 }
-            } else
-                throw(Throwable(firstPageResponse.message()))
-        }
+                usersCache.isNotEmpty() -> userListFlow.emit(usersCache.values.toList())
+                else -> throw(Throwable(lastPageResponse.message()))
+            }
+        } else
+            throw(Throwable(firstPageResponse.message()))
     }
 
     override suspend fun getUser(id: Int): Flow<User> {
@@ -59,12 +59,13 @@ class UsersRepository(
             val response = usersService.createUser(user)
             val body = response.body()
 
-            if (response.isSuccessful && body != null)
+            if (response.isSuccessful && body != null){
+                getUsersAtPage()
                 emit(body.toDomain())
+            }
             else
                 throw(Throwable(response.message()))
         }
-//        currentCoroutineContext().cancel(CancellationException(response.message()))
     }
 
     private fun generateCreationTime(): String {

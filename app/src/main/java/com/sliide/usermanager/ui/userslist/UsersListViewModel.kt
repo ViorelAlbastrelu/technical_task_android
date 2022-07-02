@@ -25,9 +25,13 @@ class UsersListViewModel @Inject constructor(
         viewModelScope.launch {
             loading()
             delay(2000) // added to see loading
-            usersRepository.getUsersAtPage().catch { throwable ->
+
+            try {
+                usersRepository.getUsersAtPage()
+            } catch (throwable: Throwable) {
                 throwable.message?.let { _state.value = UserListState.Error(it) }
-            }.collect { usersAtPage ->
+            }
+            usersRepository.userListFlow.collect { usersAtPage ->
                 if (usersAtPage.isNotEmpty()){
                     loading(false)
                     _state.value = UserListState.ListUsers(usersAtPage)

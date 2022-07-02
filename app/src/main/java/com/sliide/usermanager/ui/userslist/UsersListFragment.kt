@@ -33,7 +33,10 @@ class UsersListFragment : BindingFragment<FragmentUsersListBinding>() {
                 is UserListState.Error -> showErrorDialog(state.error) {
                     viewModel.fetchUsers()
                 }
-                is UserListState.ListUsers -> usersAdapter.submitList(state.users)
+                is UserListState.ListUsers -> {
+                    usersAdapter.submitList(state.users)
+                    binding.userList.smoothScrollToPosition(0)
+                }
                 UserListState.NoUsers -> showErrorDialog {}
             }
         }
