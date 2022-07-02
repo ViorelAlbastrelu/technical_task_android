@@ -32,6 +32,10 @@ class UsersRepository(
         }
     }
 
+    override suspend fun addUser(name: String, email: String) {
+        usersService.createUser(com.sliide.usermanager.api.model.User(0L, name, email, "", ""))
+    }
+
     private fun generateCreationTime(): String {
         val date: LocalDate = LocalDate.now()
         return date.format(DateTimeFormatter.ISO_DATE) ?: ""

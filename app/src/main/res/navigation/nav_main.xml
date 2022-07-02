@@ -10,4 +10,9 @@
         android:name="com.sliide.usermanager.ui.userslist.UsersListFragment"
         android:label="@string/user_list_toolbar_title"
         tools:layout="@layout/fragment_users_list" />
+    <dialog
+        android:id="@+id/userAddFragment"
+        android:name="com.sliide.usermanager.ui.useradd.UserAddFragment"
+        android:label="fragment_user_add"
+        tools:layout="@layout/fragment_user_add" />
 </navigation>

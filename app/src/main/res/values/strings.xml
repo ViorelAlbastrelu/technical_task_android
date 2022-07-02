@@ -1,10 +1,15 @@
 <resources>
     <string name="app_name">UserManager</string>
 
-    <!--User-->
+    <!--User List-->
     <string name="user_item_label_email">Email:</string>
     <string name="user_item_label_creation_time">Creation time:</string>
     <string name="user_list_toolbar_title">Users List</string>
+
+    <!--User Add-->
+    <string name="user_hint_add">Name</string>
+    <string name="user_hint_email">Email</string>
+    <string name="user_title_add">Add user</string>
 
     <!--Alert Dialog-->
     <string name="alert_dialog_positive_retry">Retry</string>
@@ -14,5 +19,8 @@
     <string name="alert_dialog_title_user_api_error">User api error!</string>
     <string name="alert_dialog_title_no_users">No users error!</string>
     <string name="alert_dialog_message_no_users">There were no users found.</string>
+
+    <!--User menu-->
+    <string name="user_actions_menu_add">Add</string>
 
 </resources>
