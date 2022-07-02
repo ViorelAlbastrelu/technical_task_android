@@ -5,4 +5,14 @@
     <string name="user_item_label_email">Email:</string>
     <string name="user_item_label_creation_time">Creation time:</string>
     <string name="user_list_toolbar_title">Users List</string>
+
+    <!--Alert Dialog-->
+    <string name="alert_dialog_positive_retry">Retry</string>
+    <string name="alert_dialog_positive_ok">OK</string>
+    <string name="alert_dialog_negative_cancel">Cancel</string>
+
+    <string name="alert_dialog_title_user_api_error">User api error!</string>
+    <string name="alert_dialog_title_no_users">No users error!</string>
+    <string name="alert_dialog_message_no_users">There were no users found.</string>
+
 </resources>

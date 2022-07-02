@@ -1,6 +1,6 @@
 package com.sliide.usermanager.api
 
-import com.sliide.usermanager.model.User
+import com.sliide.usermanager.api.model.User
 import retrofit2.http.*
 
 interface UsersService {

@@ -1,4 +1,4 @@
-package com.sliide.usermanager.model
+package com.sliide.usermanager.api.model
 
 data class User(
     val id: Long,

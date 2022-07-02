@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.sliide.usermanager.databinding.ItemUserBinding
-import com.sliide.usermanager.model.User
+import com.sliide.usermanager.domain.model.User
 
 class UsersAdapter : ListAdapter<User, UsersAdapter.UserViewHolder>(COMPARATOR) {
 
@@ -25,6 +25,7 @@ class UsersAdapter : ListAdapter<User, UsersAdapter.UserViewHolder>(COMPARATOR) 
             binding.apply {
                 userName.text = user.name
                 userEmail.text = user.email
+                userCreationTime.text = user.creationTime
             }
         }
     }
