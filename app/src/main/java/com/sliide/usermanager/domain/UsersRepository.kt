@@ -2,9 +2,6 @@ package com.sliide.usermanager.domain
 
 import com.sliide.usermanager.api.UsersService
 import com.sliide.usermanager.domain.model.User
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.time.LocalDate
@@ -14,22 +11,28 @@ import com.sliide.usermanager.api.model.User as ApiUser
 class UsersRepository(
     private val usersService: UsersService
 ) : UsersRepo {
+
     private var usersCache: HashMap<Int, User> = hashMapOf()
 
-    override suspend fun getUsersAtPage(page: String): Flow<List<User>> {
-        val response = usersService.getUsers(page)
-        val body = response.body()
-
+    override suspend fun getUsersAtPage(): Flow<List<User>> {
+        val firstPageResponse = usersService.getUsers(FIRST_PAGE)
         return flow {
-            if (response.isSuccessful && body != null) {
-                val creationTime = generateCreationTime()
-                val domainUsers = body.map { it.toDomain(creationTime) }
-                domainUsers.associateByTo(usersCache) { it.id }
-                emit(domainUsers)
-            } else if (usersCache.isNotEmpty()) {
-                emit(usersCache.values.toList())
+            if (firstPageResponse.isSuccessful) {
+                val lastPage = firstPageResponse.headers()["X-Pagination-Pages"] ?: FIRST_PAGE
+                val lastPageResponse = usersService.getUsers(lastPage)
+                val body = lastPageResponse.body()
+
+                when {
+                    lastPageResponse.isSuccessful && body != null -> {
+                        val domainUsers = body.map { it.toDomain() }
+                        domainUsers.associateByTo(usersCache) { it.id }
+                        emit(domainUsers)
+                    }
+                    usersCache.isNotEmpty() -> emit(usersCache.values.toList())
+                    else -> throw(Throwable(lastPageResponse.message()))
+                }
             } else
-                throw(Throwable(response.message()))
+                throw(Throwable(firstPageResponse.message()))
         }
     }
 
@@ -42,8 +45,7 @@ class UsersRepository(
             val body = response.body()
 
             if (response.isSuccessful && body != null) {
-                val creationTime = generateCreationTime()
-                val domainUser = body.toDomain(creationTime)
+                val domainUser = body.toDomain()
                 usersCache[id] = domainUser
                 emit(domainUser)
             } else
@@ -55,13 +57,10 @@ class UsersRepository(
         return flow {
             val user = com.sliide.usermanager.api.model.User(name = name, email = email)
             val response = usersService.createUser(user)
-            if (response.isSuccessful) {
-                val creationTime = generateCreationTime()
-                val body = response.body()
-                if (body != null) {
-                    emit(body.toDomain(creationTime))
-                }
-            }
+            val body = response.body()
+
+            if (response.isSuccessful && body != null)
+                emit(body.toDomain())
             else
                 throw(Throwable(response.message()))
         }
@@ -73,12 +72,17 @@ class UsersRepository(
         return date.format(DateTimeFormatter.ISO_DATE) ?: ""
     }
 
-    private fun ApiUser.toDomain(creationTime: String): User {
+    private fun ApiUser.toDomain(): User {
+        val creationTime = generateCreationTime()
         return User(
             this.id,
             this.name,
             this.email,
             creationTime
         )
+    }
+
+    companion object {
+        const val FIRST_PAGE = "1"
     }
 }

@@ -21,11 +21,11 @@ class UsersListViewModel @Inject constructor(
     val state: LiveData<UserListState>
         get() = _state
 
-    fun fetchUsers(page: Int) {
+    fun fetchUsers() {
         viewModelScope.launch {
             loading()
             delay(2000) // added to see loading
-            usersRepository.getUsersAtPage(page.toString()).catch { throwable ->
+            usersRepository.getUsersAtPage().catch { throwable ->
                 throwable.message?.let { _state.value = UserListState.Error(it) }
             }.collect { usersAtPage ->
                 if (usersAtPage.isNotEmpty()){

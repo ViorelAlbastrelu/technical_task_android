@@ -26,12 +26,12 @@ class UsersListFragment : BindingFragment<FragmentUsersListBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.userList.adapter = usersAdapter
-        viewModel.fetchUsers(1)
+        viewModel.fetchUsers()
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UserListState.Loading -> showLoading(state.isLoading)
                 is UserListState.Error -> showErrorDialog(state.error) {
-                    viewModel.fetchUsers(1)
+                    viewModel.fetchUsers()
                 }
                 is UserListState.ListUsers -> usersAdapter.submitList(state.users)
                 UserListState.NoUsers -> showErrorDialog {}
