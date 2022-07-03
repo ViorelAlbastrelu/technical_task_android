@@ -19,5 +19,5 @@ interface UsersService {
     suspend fun updateUser(user: User)
 
     @DELETE("users/{id}")
-    suspend fun deleteUser(@Path("id") id: String)
+    suspend fun deleteUser(@Path("id") id: String): Response<User>
 }

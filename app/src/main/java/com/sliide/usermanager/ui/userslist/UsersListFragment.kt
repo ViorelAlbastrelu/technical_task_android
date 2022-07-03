@@ -12,10 +12,10 @@ import com.sliide.usermanager.databinding.FragmentUsersListBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class UsersListFragment : BindingFragment<FragmentUsersListBinding>() {
+class UsersListFragment : BindingFragment<FragmentUsersListBinding>(), View.OnLongClickListener {
 
+    private val usersAdapter = UsersAdapter(this)
     private val viewModel: UsersListViewModel by viewModels()
-    private val usersAdapter = UsersAdapter()
     private var userAlert: AlertDialog? = null
 
     override fun inflateBinding(inflater: LayoutInflater): FragmentUsersListBinding {
@@ -30,14 +30,17 @@ class UsersListFragment : BindingFragment<FragmentUsersListBinding>() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UserListState.Loading -> showLoading(state.isLoading)
-                is UserListState.Error -> showErrorDialog(state.error) {
-                    viewModel.fetchUsers()
-                }
+                is UserListState.Error -> showErrorDialog(
+                    state.error,
+                    AlertDialogFactory.Type.USER_SERVICE_ERROR
+                ) { viewModel.fetchUsers() }
                 is UserListState.ListUsers -> {
                     usersAdapter.submitList(state.users)
                     binding.userList.smoothScrollToPosition(0)
                 }
-                UserListState.NoUsers -> showErrorDialog {}
+                UserListState.NoUsers -> showErrorDialog(
+                    type = AlertDialogFactory.Type.NO_USERS_ERROR
+                )
             }
         }
     }
@@ -48,6 +51,13 @@ class UsersListFragment : BindingFragment<FragmentUsersListBinding>() {
         userAlert = null
     }
 
+    override fun onLongClick(view: View): Boolean {
+        AlertDialogFactory.create(requireContext(), AlertDialogFactory.Type.DELETE_USER_ALERT) {
+            viewModel.deleteUser(view.tag as Int)
+        }
+        return true
+    }
+
     private fun showLoading(visible: Boolean) {
         binding.apply {
             progressBar.isVisible = visible
@@ -55,10 +65,14 @@ class UsersListFragment : BindingFragment<FragmentUsersListBinding>() {
         }
     }
 
-    private fun showErrorDialog(error: String = "", positiveAction: () -> Unit) {
+    private fun showErrorDialog(
+        error: String = "",
+        type: AlertDialogFactory.Type,
+        positiveAction: () -> Unit = {}
+    ) {
         try {
             dismissUserAlert()
-            userAlert = AlertDialogFactory.create(requireContext(), error, positiveAction)
+            userAlert = AlertDialogFactory.create(requireContext(), type, error, positiveAction)
         } catch (exception: IllegalStateException) {
             dismissUserAlert()
         }

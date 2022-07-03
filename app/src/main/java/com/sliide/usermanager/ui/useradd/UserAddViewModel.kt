@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sliide.usermanager.domain.UsersRepo
+import com.sliide.usermanager.ui.userslist.UserListState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -22,14 +23,15 @@ class UserAddViewModel @Inject constructor(
     val state: LiveData<UserAddState>
         get() = _state
 
-    fun addUser(name: String?, email: String?) {
+    fun addUser(name: String, email: String) {
         viewModelScope.launch {
-            usersRepository.addUser(name!!, email!!)
-                .catch { throwable ->
-                    throwable.message?.let { _state.value = UserAddState.Error(it) }
-                }.collect {
+            try {
+                usersRepository.addUser(name, email).collect {
                     _state.value = UserAddState.Success
                 }
+            } catch (throwable: Throwable) {
+                throwable.message?.let { _state.value = UserAddState.Error(it)  }
+            }
         }
     }
 

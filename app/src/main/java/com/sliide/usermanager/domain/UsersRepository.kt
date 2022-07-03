@@ -36,21 +36,13 @@ class UsersRepository(
             throw(Throwable(firstPageResponse.message()))
     }
 
-    override suspend fun getUser(id: Int): Flow<User> {
-        val cachedUser = usersCache[id]
-
-        return flow {
-            if (cachedUser != null) emit(cachedUser)
-            val response = usersService.getUserDetails(id.toString())
-            val body = response.body()
-
-            if (response.isSuccessful && body != null) {
-                val domainUser = body.toDomain()
-                usersCache[id] = domainUser
-                emit(domainUser)
-            } else
-                throw(Throwable(response.message()))
-        }
+    override suspend fun deleteUser(id: Int) {
+        val response = usersService.deleteUser(id.toString())
+        if (response.isSuccessful) {
+            usersCache.remove(id)
+            getUsersAtPage()
+        } else
+            throw(Throwable(response.message()))
     }
 
     override suspend fun addUser(name: String, email: String): Flow<User> {

@@ -20,6 +20,9 @@
     <string name="alert_dialog_title_no_users">No users error!</string>
     <string name="alert_dialog_message_no_users">There were no users found.</string>
 
+    <string name="alert_dialog_title_delete_users">Wait!</string>
+    <string name="alert_dialog_message_delete_users">Are you sure you want to remove this user?</string>
+
     <!--User menu-->
     <string name="user_actions_menu_add">Add</string>
 

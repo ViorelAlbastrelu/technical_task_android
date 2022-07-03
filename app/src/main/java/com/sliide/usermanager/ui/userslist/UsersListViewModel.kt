@@ -32,12 +32,22 @@ class UsersListViewModel @Inject constructor(
                 throwable.message?.let { _state.value = UserListState.Error(it) }
             }
             usersRepository.userListFlow.collect { usersAtPage ->
+                loading(false)
                 if (usersAtPage.isNotEmpty()){
-                    loading(false)
                     _state.value = UserListState.ListUsers(usersAtPage)
                 } else {
                     _state.value = UserListState.NoUsers
                 }
+            }
+        }
+    }
+
+    fun deleteUser(id: Int) {
+        viewModelScope.launch {
+            try {
+                usersRepository.deleteUser(id)
+            } catch (throwable: Throwable) {
+                throwable.message?.let { _state.value = UserListState.Error(it) }
             }
         }
     }

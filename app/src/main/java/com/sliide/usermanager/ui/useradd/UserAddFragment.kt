@@ -36,9 +36,11 @@ class UserAddFragment : BindingDialogFragment<FragmentUserAddBinding>() {
                 is UserAddState.AllowAdd -> enableAdd(state.enable)
                 UserAddState.Success -> dismiss()
                 is UserAddState.Error -> {
-                    AlertDialogFactory.create(requireContext(), state.error) {
-                        dismiss()
-                    }
+                    AlertDialogFactory.create(
+                        requireContext(),
+                        AlertDialogFactory.Type.USER_SERVICE_ERROR,
+                        state.error
+                    ) { dismiss() }
                 }
             }
         }
