@@ -23,7 +23,7 @@ class UsersListViewModel @Inject constructor(
     fun fetchUsers() {
         viewModelScope.launch {
             loading()
-            delay(2000) // added to see loading
+//            delay(2000) // added to see loading
 
             try {
                 usersRepository.getUsersAtLastPage()

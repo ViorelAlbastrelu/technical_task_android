@@ -2,8 +2,8 @@ package com.sliide.usermanager.domain
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
+import com.sliide.usermanager.MockUserData
 import com.sliide.usermanager.api.UsersService
-import com.sliide.usermanager.domain.model.User
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -17,8 +17,6 @@ import org.mockito.junit.MockitoJUnit
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.junit.MockitoRule
 import retrofit2.Response
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 const val name0 = "User0"
 const val name1 = "User1"
@@ -35,23 +33,8 @@ internal class UsersRepositoryTest {
 
     private lateinit var sut: UsersRepo
 
-    private val localDate: String
-        get() {
-            val date: LocalDate = LocalDate.now()
-            return date.format(DateTimeFormatter.ISO_DATE) ?: ""
-        }
-
-    private val mockApiUsersListResponse = listOf(
-        com.sliide.usermanager.api.model.User(0, name0, "$name0@email.com"),
-        com.sliide.usermanager.api.model.User(1, name1, "$name1@email.com"),
-        com.sliide.usermanager.api.model.User(2, name2, "$name2@email.com"),
-    )
-
-    private val mockUserList = listOf(
-        User(0, name0, "$name0@email.com", localDate),
-        User(1, name1, "$name1@email.com", localDate),
-        User(2, name2, "$name2@email.com", localDate)
-    )
+    private val mockApiUsersListResponse = MockUserData.mockApiUsersListResponse
+    private val mockUserList = MockUserData.mockUserList
 
     @Before
     fun setUp() {
