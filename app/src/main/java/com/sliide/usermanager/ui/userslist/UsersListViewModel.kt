@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.sliide.usermanager.domain.UsersRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,7 +26,7 @@ class UsersListViewModel @Inject constructor(
             delay(2000) // added to see loading
 
             try {
-                usersRepository.getUsersAtPage()
+                usersRepository.getUsersAtLastPage()
             } catch (throwable: Throwable) {
                 throwable.message?.let { _state.value = UserListState.Error(it) }
             }

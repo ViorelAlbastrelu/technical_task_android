@@ -16,7 +16,7 @@ class UsersRepository(
     private val userListCache: MutableList<User> = mutableListOf()
     override var userListFlow: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
 
-    override suspend fun getUsersAtPage() {
+    override suspend fun getUsersAtLastPage() {
         if (userListCache.isNotEmpty()) {
             userListFlow.emit(userListCache)
         }
@@ -45,7 +45,7 @@ class UsersRepository(
     override suspend fun deleteUser(id: Int) {
         val response = usersService.deleteUser(id.toString())
         if (response.isSuccessful) {
-            getUsersAtPage()
+            getUsersAtLastPage()
         } else
             throw(Throwable(response.message()))
     }
@@ -57,7 +57,7 @@ class UsersRepository(
             val body = response.body()
 
             if (response.isSuccessful && body != null){
-                getUsersAtPage()
+                getUsersAtLastPage()
                 emit(body.toDomain())
             }
             else
