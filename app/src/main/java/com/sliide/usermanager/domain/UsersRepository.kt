@@ -13,23 +13,29 @@ class UsersRepository(
     private val usersService: UsersService
 ) : UsersRepo {
 
-    private var usersCache: HashMap<Int, User> = hashMapOf()
+    private val userListCache: MutableList<User> = mutableListOf()
     override var userListFlow: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
 
     override suspend fun getUsersAtPage() {
+        if (userListCache.isNotEmpty()) {
+            userListFlow.emit(userListCache)
+        }
+
         val firstPageResponse = usersService.getUsers(FIRST_PAGE)
         if (firstPageResponse.isSuccessful) {
             val lastPage = firstPageResponse.headers()["X-Pagination-Pages"] ?: FIRST_PAGE
-            val lastPageResponse = usersService.getUsers(FIRST_PAGE) //TODO replace with last page
+            val lastPageResponse = usersService.getUsers(lastPage)
             val body = lastPageResponse.body()
 
             when {
                 lastPageResponse.isSuccessful && body != null -> {
                     val domainUsers = body.map { it.toDomain() }
-                    domainUsers.associateByTo(usersCache) { it.id }
-                    userListFlow.emit(domainUsers)
+                    val noUsersCached = userListCache.isEmpty()
+                    val cacheHasBeenUpdated = updateCache(domainUsers)
+                    if (noUsersCached || cacheHasBeenUpdated) {
+                        userListFlow.emit(domainUsers)
+                    }
                 }
-                usersCache.isNotEmpty() -> userListFlow.emit(usersCache.values.toList())
                 else -> throw(Throwable(lastPageResponse.message()))
             }
         } else
@@ -39,7 +45,6 @@ class UsersRepository(
     override suspend fun deleteUser(id: Int) {
         val response = usersService.deleteUser(id.toString())
         if (response.isSuccessful) {
-            usersCache.remove(id)
             getUsersAtPage()
         } else
             throw(Throwable(response.message()))
@@ -58,6 +63,18 @@ class UsersRepository(
             else
                 throw(Throwable(response.message()))
         }
+    }
+
+    private fun updateCache(users: List<User>): Boolean {
+        val areDifferentLengths = userListCache.size != users.size
+        val aNewItemIsDifferent = userListCache.zip(users).any { (cache, new) -> cache != new }
+
+        if (areDifferentLengths && aNewItemIsDifferent) {
+            userListCache.clear()
+            userListCache.addAll(users)
+            return true
+        }
+        return false
     }
 
     private fun generateCreationTime(): String {
