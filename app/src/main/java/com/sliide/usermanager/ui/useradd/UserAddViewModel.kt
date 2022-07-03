@@ -1,17 +1,14 @@
 package com.sliide.usermanager.ui.useradd
 
-import android.text.TextUtils
-import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sliide.usermanager.domain.UsersRepo
-import com.sliide.usermanager.ui.userslist.UserListState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.regex.Pattern
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,7 +38,7 @@ class UserAddViewModel @Inject constructor(
     }
 
     private fun isNameEmail(name: CharSequence): Boolean {
-        return if (TextUtils.isEmpty(name)) {
+        return if (name.isEmpty()) {
             false
         } else {
             name.length >= MIN_NAME_LENGTH
@@ -49,14 +46,23 @@ class UserAddViewModel @Inject constructor(
     }
 
     private fun isValidEmail(email: CharSequence): Boolean {
-        return if (TextUtils.isEmpty(email)) {
+        return if (email.isEmpty()) {
             false
         } else {
-            Patterns.EMAIL_ADDRESS.matcher(email).matches()
+            EMAIL_ADDRESS_PATTERN.matcher(email).matches()
         }
     }
 
     companion object {
         private const val MIN_NAME_LENGTH = 4
+        val EMAIL_ADDRESS_PATTERN: Pattern = Pattern.compile(
+            "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
+                    "\\@" +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
+                    "(" +
+                    "\\." +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
+                    ")+"
+        )
     }
 }

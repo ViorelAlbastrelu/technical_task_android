@@ -86,17 +86,4 @@ internal class UserListViewModelTest {
         //Then
         Assert.assertEquals(UserListState.ListUsers(mockUserList), uiState)
     }
-
-
-    @Test
-    fun `given when then`() = runBlocking {
-        //Given
-
-
-        //When
-
-
-        //Then
-    }
-
 }
